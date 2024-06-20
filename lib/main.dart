@@ -1,45 +1,209 @@
-import 'package:design_implementation/screens/login_screen/screen/login_screen.dart';
-import 'package:design_implementation/screens/view_chat/screen/view_chat_screen.dart';
 import 'package:flutter/material.dart';
-//----------------------------------------------------------
-void main() {
-  runApp(const MyApp());
-}
+import 'package:watsapp/Feature1/chat_with_user.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:watsapp/Feature1/list_chat_screen.dart';
+import 'package:watsapp/Feature1/login_screen.dart';
+import 'package:watsapp/Feature1/signup_screen.dart';
+import 'firebase_options.dart';
+
+
+// void main() async{
+//  await WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp(
+//     options: DefaultFirebaseOptions.currentPlatform,
+// );
+//   runApp(MaterialApp(
+    
+//     debugShowCheckedModeBanner: false,
+//     theme: ThemeData(
+//       colorScheme: ColorScheme.fromSwatch(
+//         primarySwatch: Colors.teal,
+//       ).copyWith(
+//         secondary: Color(0xff25d366),
+//       ),
+//     ),
+//     home: LoginScreen(),
+//   ));
+// }
+
+
+import 'package:flutter/material.dart';
+
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-//--------------------------------------------
-  // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-     initialRoute: '/',
       routes: {
-        '/': (context) =>  LoginScreen(),
-        '/screen2': (context) =>  LoginScreen(),
-        // Add other routes if needed
+        ExtractArgumentsScreen.routeName: (context) =>
+            const ExtractArgumentsScreen(),
       },
+      // Provide a function to handle named routes.
+      // Use this function to identify the named
+      // route being pushed, and create the correct
+      // Screen.
+      onGenerateRoute: (settings) {
+        // If you push the PassArguments route
+        if (settings.name == PassArgumentsScreen.routeName) {
+          // Cast the arguments to the correct
+          // type: ScreenArguments.
+          final args = settings.arguments as ScreenArguments;
+
+          // Then, extract the required data from
+          // the arguments and pass the data to the
+          // correct screen.
+          return MaterialPageRoute(
+            builder: (context) {
+              return PassArgumentsScreen(
+                title: args.title,
+                message: args.message,
+              );
+            },
+          );
+        }
+        // The code only supports
+        // PassArgumentsScreen.routeName right now.
+        // Other values need to be implemented if we
+        // add them. The assertion here will help remind
+        // us of that higher up in the call stack, since
+        // this assertion would otherwise fire somewhere
+        // in the framework.
+        assert(false, 'Need to implement ${settings.name}');
+        return null;
+      },
+      title: 'Navigation with Arguments',
+      home: const HomeScreen(),
     );
   }
 }
 
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home Screen'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // A button that navigates to a named route.
+            // The named route extracts the arguments
+            // by itself.
+            ElevatedButton(
+              onPressed: () {
+                // When the user taps the button,
+                // navigate to a named route and
+                // provide the arguments as an optional
+                // parameter.
+                Navigator.pushNamed(
+                  context,
+                  ExtractArgumentsScreen.routeName,
+                  arguments: ScreenArguments(
+                    'titlt',
+                    'message',
+                  ),
+                );
+              },
+              child: const Text('Navigate to screen that extracts arguments'),
+            ),
+            // A button that navigates to a named route.
+            // For this route, extract the arguments in
+            // the onGenerateRoute function and pass them
+            // to the screen.
+            ElevatedButton(
+              onPressed: () {
+                // When the user taps the button, navigate
+                // to a named route and provide the arguments
+                // as an optional parameter.
+                Navigator.pushNamed(
+                  context,
+                  PassArgumentsScreen.routeName,
+                  arguments: ScreenArguments(
+                    'Accept Arguments Screen',
+                    'This message is extracted in the onGenerateRoute '
+                        'function.',
+                  ),
+                );
+              },
+              child: const Text('Navigate to a named that accepts arguments'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// A Widget that extracts the necessary arguments from
+// the ModalRoute.
+class ExtractArgumentsScreen extends StatelessWidget {
+  const ExtractArgumentsScreen({super.key});
+
+  static const routeName = '/extractArguments';
+
+  @override
+  Widget build(BuildContext context) {
+    // Extract the arguments from the current ModalRoute
+    // settings and cast them as ScreenArguments.
+    final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(args.title),
+      ),
+      body: Center(
+        child: Text(args.message),
+      ),
+    );
+  }
+}
+
+// A Widget that accepts the necessary arguments via the
+// constructor.
+class PassArgumentsScreen extends StatelessWidget {
+  static const routeName = '/passArguments';
+
+  final String title;
+  final String message;
+
+  // This Widget accepts the arguments as constructor
+  // parameters. It does not extract the arguments from
+  // the ModalRoute.
+  //
+  // The arguments are extracted by the onGenerateRoute
+  // function provided to the MaterialApp widget.
+  const PassArgumentsScreen({
+    super.key,
+    required this.title,
+    required this.message,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+      ),
+      body: Center(
+        child: Text(message),
+      ),
+    );
+  }
+}
+
+// You can pass any object to the arguments parameter.
+// In this example, create a class that contains both
+// a customizable title and message.
+class ScreenArguments {
+  final String title;
+  final String message;
+
+  ScreenArguments(this.title, this.message);
+}

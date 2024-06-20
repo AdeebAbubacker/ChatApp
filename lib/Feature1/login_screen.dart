@@ -1,12 +1,13 @@
-import 'package:design_implementation/routes/app_route_config.dart';
-import 'package:design_implementation/screens/home_screen/homescreen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:watsapp/Feature1/home_screen.dart';
+import 'package:watsapp/Feature1/list_chat_screen.dart';
+import 'package:watsapp/Feature1/profilesetup_screen.dart';
+import 'package:watsapp/Feature1/signup_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,11 +66,11 @@ class LoginScreen extends StatelessWidget {
                     if (user != null) {
                       print(user.email);
                       print(user.displayName);
-                      navigateToScreen2(
-                          context,
-                          Message(
-                              content1: emailController.text,
-                              content2: emailController.text));
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProfileSetupPage()),
+                      );
                     }
                   } catch (e) {
                     print('Error: $e');

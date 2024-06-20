@@ -1,6 +1,6 @@
 {
-    "name": "design_implementation",
-    "short_name": "design_implementation",
+    "name": "chat_app",
+    "short_name": "chat_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
